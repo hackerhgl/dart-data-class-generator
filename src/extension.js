@@ -748,6 +748,8 @@ class DataClassGenerator {
                 if (!clazz.isAbstract) {
                     if (readSetting('copyWith.enabled') && this.isPartSelected('copyWith'))
                         this.insertCopyWith(clazz);
+                    if (readSetting('merge.enabled') && this.isPartSelected('merge'))
+                        this.insertMerge(clazz);
                     if (readSetting('toMap.enabled') && this.isPartSelected('serialization'))
                         this.insertToMap(clazz);
                     if (readSetting('fromMap.enabled') && this.isPartSelected('serialization'))
@@ -1046,6 +1048,23 @@ class DataClassGenerator {
         method += '}';
 
         this.appendOrReplace('copyWith', method, `${clazz.name} copyWith(`, clazz);
+    }
+
+    /**
+	 * @param {DartClass} clazz
+	 */
+    insertMerge(clazz) {
+        let method = clazz.type + ' merge('+clazz.type+' model) {\n';
+        method += '  return ' + clazz.type + '(\n';
+
+        for (let p of clazz.properties) {
+            method += `    ${clazz.hasNamedConstructor ? `${p.name}: ` : ''}model.${p.name} ?? this.${p.name},\n`;
+        }
+
+        method += '  );\n'
+        method += '}';
+
+        this.appendOrReplace('merge', method, `${clazz.name} merge(`, clazz);
     }
 
 	/**
@@ -1972,6 +1991,8 @@ class DataClassCodeActions {
             if (!this.clazz.isAbstract) {
                 if (readSetting('copyWith.enabled'))
                     codeActions.push(this.createCopyWithFix());
+                if (readSetting('merge.enabled'))
+                    codeActions.push(this.createMergeFix());
                 if (readSettings(['toMap.enabled', 'fromMap.enabled', 'toJson.enabled', 'fromJson.enabled']))
                     codeActions.push(this.createSerializationFix());
             }
@@ -2048,6 +2069,10 @@ class DataClassCodeActions {
 
     createCopyWithFix() {
         return this.constructQuickFix('copyWith', 'Generate copyWith');
+    }
+
+    createMergeFix() {
+        return this.constructQuickFix('merge', 'Generate merge');
     }
 
     createSerializationFix() {
