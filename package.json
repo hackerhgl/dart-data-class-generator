@@ -1,9 +1,9 @@
 {
-	"name": "dart-data-class-generator",
-	"displayName": "Dart Data Class Generator",
+	"name": "dart-data-class-generator-merge",
+	"displayName": "Dart Data Class Generator Merge",
 	"description": "Create dart data classes easily, fast and without writing boilerplate or running code generation.",
-	"publisher": "BendixMa",
-	"version": "0.4.4",
+	"publisher": "hackerhgl",
+	"version": "0.4.45",
 	"engines": {
 		"vscode": "^1.37.0"
 	},
@@ -51,6 +51,15 @@
 			{
 				"title": "Dart Data Class Generator configuration",
 				"properties": {
+					"dart_data_class_generator.camel_case": {
+						"type": "boolean",
+						"enum": [
+							true,
+							false
+						],
+						"default": true,
+						"description": "If true, make new properties with camelCase"
+					},
 					"dart_data_class_generator.quick_fixes": {
 						"type": "boolean",
 						"enum": [
@@ -231,5 +240,8 @@
 		"mocha": "^6.1.4",
 		"typescript": "^3.3.1",
 		"vscode-test": "^1.0.2"
+	},
+	"dependencies": {
+		"lodash": "^4.17.20"
 	}
 }

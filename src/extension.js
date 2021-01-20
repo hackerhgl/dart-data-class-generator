@@ -1,6 +1,7 @@
 const vscode = require('vscode');
 const fs = require('fs');
 const path = require('path');
+const camelCase = require('lodash/camelCase');
 
 var projectName = '';
 var isFlutter = false;
@@ -714,6 +715,7 @@ class DataClassGenerator {
         this.part = part;
         this.generateDataClazzes();
         this.clazz = null;
+        this.parsed = null;
     }
 
     get hasImports() {
@@ -2325,6 +2327,7 @@ async function writeFile(content, name, open = true, path = getCurrentPath()) {
  * @param {string} source
  */
 function toVarName(source) {
+    const settings = readSetting('camel_case');
     let s = source;
     let r = '';
 
@@ -2390,6 +2393,10 @@ function toVarName(source) {
 
     if (r.length > 0 && r[0].match(new RegExp(/[0-9]/)))
         r = 'n' + r;
+    
+    if (settings) {
+        return camelCase(r);
+    }
 
     return r;
 }
