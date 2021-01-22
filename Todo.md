@@ -1,0 +1,3 @@
+- Fix Class Name Generation
+- Fix List parsing with empty list in case of null
+- Try catch in root class to handle parsing errors
