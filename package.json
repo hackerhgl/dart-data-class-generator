@@ -3,7 +3,7 @@
 	"displayName": "Dart Data Class Generator Merge",
 	"description": "Create dart data classes easily, fast and without writing boilerplate or running code generation.",
 	"publisher": "hackerhgl",
-	"version": "0.4.45",
+	"version": "0.4.47",
 	"engines": {
 		"vscode": "^1.37.0"
 	},
@@ -59,6 +59,15 @@
 						],
 						"default": true,
 						"description": "If true, make new properties with camelCase"
+					},
+					"dart_data_class_generator.json_snake_case": {
+						"type": "boolean",
+						"enum": [
+							true,
+							false
+						],
+						"default": false,
+						"description": "If true, change case of fromMap toMap map keys"
 					},
 					"dart_data_class_generator.quick_fixes": {
 						"type": "boolean",

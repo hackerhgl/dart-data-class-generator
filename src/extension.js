@@ -2,6 +2,8 @@ const vscode = require('vscode');
 const fs = require('fs');
 const path = require('path');
 const camelCase = require('lodash/camelCase');
+const snakeCase = require('lodash/snakeCase');
+const startCase = require('lodash/startCase');
 
 var projectName = '';
 var isFlutter = false;
@@ -927,6 +929,8 @@ class DataClassGenerator {
         let startBracket = '({';
         let endBracket = '})';
 
+
+
         if (required) {
             this.requiresImport('package:meta/meta.dart', [
                 'package:flutter/material.dart',
@@ -1073,6 +1077,8 @@ class DataClassGenerator {
 	 * @param {DartClass} clazz
 	 */
     insertToMap(clazz) {
+        const isJsonSnakeCase = readSetting('json_snake_case');
+
         let props = clazz.properties;
         /**
          * @param {ClassField} prop
@@ -1096,7 +1102,7 @@ class DataClassGenerator {
         let method = `Map<String, dynamic> toMap() {\n`;
         method += '  return {\n';
         for (let p of props) {
-            method += `    '${p.jsonName}': `;
+            method += `    '${isJsonSnakeCase ? snakeCase(p.jsonName) : p.jsonName}': `;
 
             if (p.isEnum) {
                 method += `${p.name}?.index,\n`;
@@ -1121,18 +1127,22 @@ class DataClassGenerator {
 	 * @param {DartClass} clazz
 	 */
     insertFromMap(clazz) {
+        const isJsonSnakeCase = readSetting('json_snake_case');
+        const isCamelCase = readSetting('camel_case');
         let defVal = readSetting('fromMap.default_values');
         let props = clazz.properties;
         const fromJSON = this.fromJSON;
-
         /**
          * @param {ClassField} prop
          */
         function customTypeMapping(prop, value = null) {
             prop = prop.isCollection ? prop.listType : prop;
+            let newValue;
             const addDefault = defVal && prop.type != 'dynamic';
             const endFlag = value == null ? ',\n' : '';
-            value = value == null ? "map['" + prop.jsonName + "']" : value;
+            if (value == null) {
+                newValue =  `map['${isJsonSnakeCase ? snakeCase(prop.jsonName) : prop.jsonName}']`;
+            }
 
             switch (prop.type) {
                 case 'DateTime':
@@ -1142,7 +1152,7 @@ class DataClassGenerator {
                 case 'IconData':
                     return `IconData(${value}, fontFamily: 'MaterialIcons')${endFlag}`
                 default:
-                    return `${!prop.isPrimitive ? prop.type + '.fromMap(' : ''}${value}${!prop.isPrimitive ? ')' : ''}${fromJSON ? (prop.isDouble ? '?.toDouble()' : prop.isInt ? '?.toInt()' : '') : ''}${addDefault ? ` ?? ${prop.defValue}` : ''}${endFlag}`;
+                    return `${!prop.isPrimitive ? prop.type + '.fromMap(' : ''}${newValue || value}${!prop.isPrimitive ? ')' : ''}${fromJSON ? (prop.isDouble ? '?.toDouble()' : prop.isInt ? '?.toInt()' : '') : ''}${addDefault ? ` ?? ${prop.defValue}` : ''}${endFlag}`;
             }
         }
 
@@ -1152,7 +1162,7 @@ class DataClassGenerator {
         for (let p of props) {
             method += `    ${clazz.hasNamedConstructor ? `${p.name}: ` : ''}`;
 
-            const value = `map['${p.jsonName}']`;
+            const value = `map['${isJsonSnakeCase ? snakeCase(p.jsonName) : p.jsonName}']`;
             if (p.isEnum) {
                 const defaultValue = defVal ? ' ?? 0' : '';
                 method += `${p.type}.values[${value}${defaultValue}],\n`;
