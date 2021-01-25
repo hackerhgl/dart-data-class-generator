@@ -4,6 +4,7 @@ const path = require('path');
 const camelCase = require('lodash/camelCase');
 const snakeCase = require('lodash/snakeCase');
 const startCase = require('lodash/startCase');
+const { print } = require('util');
 
 var projectName = '';
 var isFlutter = false;
@@ -1152,7 +1153,21 @@ class DataClassGenerator {
                 case 'IconData':
                     return `IconData(${value}, fontFamily: 'MaterialIcons')${endFlag}`
                 default:
-                    return `${!prop.isPrimitive ? prop.type + '.fromMap(' : ''}${newValue || value}${!prop.isPrimitive ? ')' : ''}${fromJSON ? (prop.isDouble ? '?.toDouble()' : prop.isInt ? '?.toInt()' : '') : ''}${addDefault ? ` ?? ${prop.defValue}` : ''}${endFlag}`;
+                    if (prop.name.toLowerCase ()=== "basefare" ) {
+                        console.log('wow prop.isPrimitive', prop.isPrimitive, prop.isInt);
+                    }
+                    let string = `${!prop.isPrimitive ? `${prop.type}.fromMap(` : ''}${newValue || value}${!prop.isPrimitive ? ')' : ''}`;
+                    if (prop.isPrimitive && prop.isDouble) {
+                        string += '?.toDouble()';
+                    }
+                    else if (prop.isPrimitive && prop.isInt) {
+                        string += '?.toInt()';
+                    }
+                    if (addDefault) {
+                        string += prop.defValue;
+                    }
+                    string+= endFlag;
+                    return string;
             }
         }
 
@@ -1168,12 +1183,11 @@ class DataClassGenerator {
                 method += `${p.type}.values[${value}${defaultValue}],\n`;
             } else if (p.isCollection) {
                 const defaultValue = defVal ? ` ?? const ${p.isList ? '[]' : '{}'}` : '';
-
                 method += `${p.type}.from(`;
                 if (p.isPrimitive) {
-                    method += `${value}${defaultValue}),\n`;
+                    method += `${value}${defaultValue} ?? []),\n`;
                 } else {
-                    method += `${value}?.map((x) => ${customTypeMapping(p, 'x')})${defaultValue}),\n`;
+                    method += `${value}?.map((x) => ${customTypeMapping(p, 'x')})${defaultValue} ?? []),\n`;
                 }
             } else {
                 method += customTypeMapping(p);

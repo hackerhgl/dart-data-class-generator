@@ -3,7 +3,7 @@
 	"displayName": "Dart Data Class Generator Merge",
 	"description": "Create dart data classes easily, fast and without writing boilerplate or running code generation.",
 	"publisher": "hackerhgl",
-	"version": "0.4.47",
+	"version": "0.4.48",
 	"engines": {
 		"vscode": "^1.37.0"
 	},
@@ -237,7 +237,8 @@
 		]
 	},
 	"scripts": {
-		"test": "node ./test/runTest.js"
+		"test": "node ./test/runTest.js",
+		"dev": "vsce package && code --install-extension dart-data-class-generator-merge-0.4.48.vsix"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.1",
